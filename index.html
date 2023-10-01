@@ -5,7 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario dell'Avvento</title>
     <style>
-        
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #d9534f;
+        }
+
+        .countdown-container {
+            margin-top: 20px;
+        }
+
+        .countdown-text {
+            color: #5bc0de;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .countdown-item {
+            margin: 0 10px;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .countdown-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .countdown-label {
+            font-size: 14px;
+            color: #5bc0de;
+        }
+
+        .calendar {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 30px;
+        }
+
+        .day {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 24px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #fff;
+        }
+
+        .day.locked {
+            background-color: #eee;
+            cursor: not-allowed;
+        }
+
+        .day.unlocked {
+            background-color: #d4edda;
+            cursor: pointer;
+        }
+
+        .day.past {
+            background-color: #f8d7da;
+        }
+
+        .day.current {
+            background-color: #cce5ff;
+        }
+
+        .day img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
     </style>
 </head>
 <body>
@@ -109,7 +192,125 @@
         </div>
     </div>
     <script>
-        
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const currentDay = today.getDate();
+            const currentMonth = today.getMonth() + 1;
+            const targetDate = new Date(today.getFullYear(), 11, 1);
+
+            if (currentMonth === 12) {
+                if (currentDay === 25) {
+                    document.body.innerHTML = "<h1>È Natale!</h1>";
+                } else if (currentDay > 25) {
+                    document.body.innerHTML = "<h1>Aspettiamo il mese di Natale!</h1>";
+                    const countdownContainer = document.createElement('div');
+                    countdownContainer.classList.add('countdown-container');
+                    document.body.appendChild(countdownContainer);
+
+                    const countdownTimer = document.createElement('div');
+                    countdownTimer.classList.add('countdown-timer');
+                    countdownContainer.appendChild(countdownTimer);
+
+                    setInterval(function() {
+                        const now = new Date();
+                        const timeDiff = targetDate.getTime() - now.getTime();
+
+                        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                        const hoursDiff = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutesDiff = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                        const secondsDiff = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                        countdownTimer.innerHTML = `
+                        <div class="countdown-item">
+                        <span class="countdown-value">${daysDiff}</span>
+                        <span class="countdown-label">Giorni</span>
+                        </div>
+                        <div class="countdown-item">
+                        <span class="countdown-value">${hoursDiff}</span>
+                        <span class="countdown-label">Ore</span>
+                        </div>
+                        <div class="countdown-item">
+                        <span class="countdown-value">${minutesDiff}</span>
+                        <span class="countdown-label">Minuti</span>
+                        </div>
+                        <div class="countdown-item">
+                        <span class="countdown-value">${secondsDiff}</span>
+                        <span class="countdown-label">Secondi</span>
+                        </div>
+                        `;
+                    }, 1000);
+
+                } else if (currentDay >= 1) {
+                    const days = document.querySelectorAll('.day');
+
+                    days.forEach(function(day, index) {
+                        const dayNumber = index + 1;
+                        if (dayNumber < currentDay) {
+                            day.classList.remove('locked');
+                            day.classList.add('unlocked', 'past');
+                        } else if (dayNumber === currentDay) {
+                            day.classList.remove('locked');
+                            day.classList.add('unlocked', 'current');
+                        }
+                    });
+
+                    days.forEach(function(day, index) {
+                        day.addEventListener('click', function() {
+                            const dayNumber = index + 1;
+
+                            if (day.classList.contains('unlocked') && !day.classList.contains('opened')) {
+                                if (dayNumber < currentDay) {
+                                    alert(`Il giorno ${dayNumber} è già passato.`);
+                                } else if (dayNumber === currentDay) {
+                                    alert(`Hai aperto il giorno ${dayNumber}!`);
+                                    day.classList.add('opened');
+                                } else {
+                                    alert(`Non siamo ancora al giorno ${dayNumber}.`);
+                                }
+                            }
+                        });
+                    });
+                }
+            } else {
+                document.body.innerHTML = `<h1>All'1 dicembre ${today.getFullYear()} mancano:</h1>`;
+                const countdownContainer = document.createElement('div');
+                countdownContainer.classList.add('countdown-container');
+                document.body.appendChild(countdownContainer);
+
+                const countdownTimer = document.createElement('div');
+                countdownTimer.classList.add('countdown-timer');
+                countdownContainer.appendChild(countdownTimer);
+
+                setInterval(function() {
+                    const now = new Date();
+                    const timeDiff = targetDate.getTime() - now.getTime();
+
+                    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hoursDiff = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutesDiff = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secondsDiff = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                    countdownTimer.innerHTML = `
+                    <div class="countdown-item">
+                    <span class="countdown-value">${daysDiff}</span>
+                    <span class="countdown-label">Giorni</span>
+                    </div>
+                    <div class="countdown-item">
+                    <span class="countdown-value">${hoursDiff}</span>
+                    <span class="countdown-label">Ore</span>
+                    </div>
+                    <div class="countdown-item">
+                    <span class="countdown-value">${minutesDiff}</span>
+                    <span class="countdown-label">Minuti</span>
+                    </div>
+                    <div class="countdown-item">
+                    <span class="countdown-value">${secondsDiff}</span>
+                    <span class="countdown-label">Secondi</span>
+                    </div>
+                    `;
+                }, 1000);
+            }
+        });
     </script>
 </body>
 </html>
